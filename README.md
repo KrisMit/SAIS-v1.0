@@ -9,21 +9,23 @@ for Deep Space Exploration. AATC Expedition Olympus Technical Report.**
 ```
 sais-v1.0/
 ├── layers/
-│   ├── layer1_fuzzy_logic.py          # Fuzzy Safety Guardian
-│   ├── layer2_ml_ensemble.py          # ML anomaly detection
-│   ├── layer3_bayesian.py             # Bayesian diagnostics
-│   ├── layer4_orchestrator.py         # Decision synthesis
-│   └── layer5_llm_fallback.py         # Document-grounded LLM
+│   ├── space_ai_ststem(sais).py          # Fuzzy Safety Guardian
+│   ├── space_ai_ststem(sais).py          # ML anomaly detection
+│   ├── space_ai_ststem(sais).py          # Bayesian diagnostics
+│   ├── space_ai_ststem(sais).py          # Decision synthesis
+│   └── llm_experiment.py.py              # Document-grounded LLM
+│   └── mission_agent_claude.py           #claude ai agent
+│   └── mission_agent_local.py            #local AI agent
 │
 ├── invisible_threads/
-│   ├── pulse_detection.js             # rPPG algorithm (WebAR)
-│   ├── painting_overlay.html          # Interactive art installation
+│   ├── pulse_reveal.js                 # rPPG algorithm (WebAR)
+│   ├── invisible_threads.html          # Interactive art installation
 │   └── mission_day_mapping.json
 │
 ├── analysis/
-│   ├── mission_analysis.py            # NASA-TLX analysis
+│   ├── analysis.py                    # NASA-TLX analysis
 │   ├── visualization.py               # Dashboard & plotting
-│   └── llm_experiment_log.py
+│   
 │
 ├── evaluation/
 │   ├── pre_registered_protocol.md     # Section 9 evaluation spec
