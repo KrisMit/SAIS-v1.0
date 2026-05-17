@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invisible Threads — Mission Log · Expedition Olympus</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;padding:12px;max-width:620px;margin:0 auto;min-height:100vh}
+.screen{display:none}.screen.active{display:block}
+.card{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;padding:16px;margin-bottom:12px}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;margin-bottom:10px;letter-spacing:.05em}
+.b-teal{background:#0f4a38;color:#4ecdc4}
+.b-blue{background:#1a2a4a;color:#63b3ed}
+.b-amber{background:#3d2a00;color:#f6ad55}
+.b-red{background:#3d1515;color:#fc8181}
+.b-green{background:#1a3a1a;color:#68d391}
+h2{font-size:18px;font-weight:700;margin-bottom:6px}
+h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.sub{font-size:13px;color:#718096;line-height:1.55;margin-bottom:10px}
+.tip{background:#1e2a3a;border-left:3px solid #4299e1;padding:10px 12px;border-radius:0 8px 8px 0;font-size:12px;color:#90cdf4;line-height:1.5;margin-bottom:14px}
+.warn{background:#3d2a00;border-left:3px solid #f6ad55;padding:10px 12px;border-radius:0 8px 8px 0;font-size:12px;color:#f6ad55;line-height:1.5;margin-bottom:14px}
+label{font-size:13px;color:#a0aec0;display:block;margin-bottom:5px;font-weight:500}
+select,input[type=number],textarea,input[type=text]{width:100%;font-size:14px;font-family:inherit;padding:10px 12px;border:1px solid #2d3748;border-radius:8px;background:#0f1117;color:#e2e8f0;margin-bottom:12px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:#4ecdc4}
+textarea{min-height:80px;resize:vertical}
+.btn{display:block;width:100%;padding:13px;border:1px solid #2d3748;border-radius:8px;background:#1a1f2e;color:#e2e8f0;font-size:14px;font-weight:500;cursor:pointer;text-align:center;margin-bottom:8px;font-family:inherit;transition:background .15s}
+.btn:hover{background:#2d3748}
+.btn-p{background:#4ecdc4;border-color:#4ecdc4;color:#0f1117;font-weight:700}
+.btn-p:hover{background:#38b2ac}
+.btn-danger{background:#742a2a;border-color:#fc8181;color:#fc8181}
+.btn-sm{padding:8px 14px;font-size:12px;width:auto;display:inline-block;margin:0}
+.brow{display:flex;gap:8px;flex-wrap:wrap}
+.prog{background:#1a1f2e;border:1px solid #2d3748;border-radius:10px;padding:12px;margin-bottom:12px}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:8px}
+.prog-lbl{font-size:13px;font-weight:500}
+.prog-pct{font-size:13px;color:#4ecdc4;font-family:monospace}
+.prog-bar{height:5px;background:#2d3748;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#4ecdc4;transition:width .3s;border-radius:3px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px}
+.tab{padding:9px 2px;border:1px solid #2d3748;border-radius:8px;background:#1a1f2e;color:#718096;font-size:11px;cursor:pointer;text-align:center;font-family:inherit;font-weight:500}
+.tab.on{background:#e2e8f0;color:#0f1117;border-color:#e2e8f0;font-weight:700}
+.panel{display:none}.panel.on{display:block}
+.tlx-item{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid #2d3748}
+.tlx-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.tlx-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.tlx-name{font-size:14px;font-weight:700}
+.tlx-val{font-size:22px;font-weight:700;color:#4ecdc4;font-family:monospace;min-width:36px;text-align:right}
+.tlx-desc{font-size:12px;color:#a0aec0;margin-bottom:6px;line-height:1.45}
+.tlx-ex{font-size:11px;color:#718096;font-style:italic;margin-bottom:8px}
+.tlx-warn{font-size:11px;color:#f6ad55;font-weight:600;margin-bottom:6px;background:#3d2a00;padding:5px 8px;border-radius:5px}
+input[type=range]{width:100%;border:none;padding:0;margin-bottom:4px;accent-color:#4ecdc4;background:none;height:20px}
+.tlx-ends{display:flex;justify-content:space-between;font-size:11px;color:#4a5568}
+.pan-scale-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:12px;text-align:center}
+.pan-scale-legend div{background:#1a1f2e;border:1px solid #2d3748;border-radius:6px;padding:6px 2px;font-size:11px;color:#a0aec0;line-height:1.3}
+.pan-scale-legend div strong{display:block;font-size:15px;color:#4ecdc4;margin-bottom:2px}
+.pan-intro{background:#1a2a1a;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;color:#9ae6b4;line-height:1.7}
+.pan-cnt{font-size:13px;color:#a0aec0;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.pan-cnt b{color:#4ecdc4;font-family:monospace;font-size:16px}
+.pan-hdr{display:grid;grid-template-columns:1fr repeat(5,42px);gap:4px;margin-bottom:6px;align-items:end}
+.pan-hdr span{font-size:9px;color:#4a5568;text-align:center;line-height:1.3}
+.pan-row{display:grid;grid-template-columns:1fr repeat(5,42px);gap:4px;align-items:center;padding:7px 0;border-bottom:1px solid #1e2535}
+.pan-row:last-child{border-bottom:none}
+.pan-word{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dp{background:#48bb78}.dn{background:#fc8181}
+.pb{width:42px;height:42px;border:1px solid #2d3748;border-radius:7px;background:#1a1f2e;color:#718096;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.pb:hover{border-color:#4ecdc4;color:#4ecdc4}
+.pb.sp{background:#276749;border-color:#48bb78;color:#9ae6b4}
+.pb.sn{background:#742a2a;border-color:#fc8181;color:#fed7d7}
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ef label{font-size:12px}
+.ef select,.ef input{margin-bottom:0}
+.ec{border:1px solid #2d3748;border-radius:10px;padding:12px;margin-bottom:8px}
+.eh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ec-crew{font-size:13px;font-weight:700}
+.ec-day{font-size:12px;color:#4ecdc4;font-family:monospace}
+.sc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sc{background:#0f1117;border-radius:8px;padding:8px;text-align:center}
+.sc-l{font-size:10px;color:#4a5568;margin-bottom:2px}
+.sc-v{font-size:17px;font-weight:700;font-family:monospace}
+.hi{color:#fc8181}.mid{color:#f6ad55}.lo{color:#48bb78}
+.empty{text-align:center;color:#4a5568;font-size:13px;padding:32px}
+.save-indicator{background:#1a3a1a;border:1px solid #276749;border-radius:8px;padding:10px 14px;font-size:12px;color:#68d391;margin-bottom:10px;display:none}
+.backup-area{background:#0f1117;border:1px solid #2d3748;border-radius:8px;padding:12px;font-size:11px;color:#4a5568;font-family:monospace;word-break:break-all;max-height:120px;overflow-y:auto;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div id="s0" class="screen active">
+  <div class="card">
+    <div class="badge b-teal">INVISIBLE THREADS · Expedition Olympus</div>
+    <h2>Mission Research Log</h2>
+    <p class="sub">Daily biometric assessment · approximately 18 minutes per day · works fully offline on any device.</p>
+    <div class="tip">
+      📋 Fill once per day:<br>
+      · <strong>NASA-TLX</strong> — immediately after your most demanding task<br>
+      · <strong>PANAS</strong> — at the fixed daily time agreed with the crew<br>
+      · <strong>Journal</strong> — before sleep<br>
+      · <strong>Export CSV</strong> on Day 8 and give the file to Kristina
+    </div>
+    <div class="warn">⚠ <strong>Important:</strong> Data is saved to this browser only. Always use the same browser on the same device. Export your CSV on the last day — do not clear browser data during the mission.</div>
+    <label>Your crew ID</label>
+    <select id="crewSel">
+      <option value="">— Select your name —</option>
+      <option>EXP106CDR</option><option>EXP106MED1</option><option>EXP106MED2</option><option>EXP106SPORT</option>
+      <option>EXP106COM1</option><option>EXP106DAT</option><option>EXP106ENG1</option><option>EXP106ENG2</option>
+      <option>EXP106MS</option><option>EXP106BIO1</option><option>EXP106BIO2</option><option>EXP106COM2</option>
+    </select>
+    <label>Mission day</label>
+    <select id="daySel">
+      <option value="">— Select today's day —</option>
+      <option value="1">Day 1</option><option value="2">Day 2</option>
+      <option value="3">Day 3</option><option value="4">Day 4</option>
+      <option value="5">Day 5</option><option value="6">Day 6</option>
+      <option value="7">Day 7</option><option value="8">Day 8</option>
+    </select>
+    <button class="btn btn-p" onclick="go()">Begin today's assessment →</button>
+    <div class="brow" style="margin-top:4px">
+      <button class="btn btn-sm" onclick="viewData()">📊 View all data</button>
+      <button class="btn btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-sm" onclick="exportJSON()">⬇ Export JSON</button>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:#4a5568;" id="storageStatus"></div>
+  </div>
+</div>
+
+<div id="s1" class="screen">
+  <div class="prog">
+    <div class="prog-top">
+      <span class="prog-lbl" id="fTitle">—</span>
+      <span class="prog-pct" id="fPct">0%</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="pF" style="width:0%"></div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab on" onclick="showTab('tlx')">NASA-TLX</div>
+    <div class="tab" onclick="showTab('panas')">PANAS</div>
+    <div class="tab" onclick="showTab('env')">Environment</div>
+    <div class="tab" onclick="showTab('journal')">Journal</div>
+  </div>
+
+  <div id="pt" class="panel on">
+    <div class="card">
+      <div class="badge b-blue">NASA-TLX · Task Load Index</div>
+      <h3>How demanding was today?</h3>
+      <p class="sub">Rate each dimension based on your overall experience today. Drag the slider. 0 = very low / not at all · 100 = very high / extreme.</p>
+      <div class="tip">⏱ Fill this immediately after your most mentally demanding task — while it's fresh.</div>
+      <div id="tlxBox"></div>
+    </div>
+  </div>
+
+  <div id="pp" class="panel">
+    <div class="card">
+      <div class="badge b-teal">PANAS · Emotional State Assessment</div>
+      <h3>How did you feel today?</h3>
+      <p class="sub">Tap a number for each word that best describes how much you felt that emotion <strong>today during the mission</strong>. Answer all 20 — there are no right or wrong answers.</p>
+      <div class="pan-scale-legend">
+        <div><strong>1</strong>Very slightly / not at all</div>
+        <div><strong>2</strong>A little</div>
+        <div><strong>3</strong>Moderately</div>
+        <div><strong>4</strong>Quite a bit</div>
+        <div><strong>5</strong>Extremely</div>
+      </div>
+      <div class="pan-intro">
+        <span style="color:#48bb78;font-weight:700">● Green dot</span> = Positive emotions &nbsp;&nbsp;
+        <span style="color:#fc8181;font-weight:700">● Red dot</span> = Negative emotions<br>
+        Be honest — answer based on how you actually felt, not how you think you should feel.
+      </div>
+      <div class="pan-cnt">Answered: <b id="panCnt">0</b> / 20</div>
+      <div class="pan-hdr">
+        <span></span>
+        <span>1<br>Very<br>slightly</span>
+        <span>2<br>A<br>little</span>
+        <span>3<br>Mod-<br>erately</span>
+        <span>4<br>Quite<br>a bit</span>
+        <span>5<br>Extrem-<br>ely</span>
+      </div>
+      <div id="panasBox"></div>
+    </div>
+  </div>
+
+  <div id="pe" class="panel">
+    <div class="card">
+      <div class="badge b-amber">Environment &amp; Physical State</div>
+      <h3>Physical and situational observations</h3>
+      <p class="sub">Contextual data that helps interpret your biometric readings. Answer honestly.</p>
+      <div class="eg">
+        <div class="ef">
+          <label>Sleep quality last night (1–10)</label>
+          <input type="number" id="e1" min="1" max="10" placeholder="1=terrible 10=great">
+        </div>
+        <div class="ef">
+          <label>Frustration events today (count)</label>
+          <input type="number" id="e2" min="0" placeholder="0, 1, 2...">
+        </div>
+        <div class="ef">
+          <label>Exercise completed</label>
+          <select id="e3"><option value="">—</option><option>Yes — full</option><option>Yes — partial</option><option>No</option></select>
+        </div>
+        <div class="ef">
+          <label>Emergency simulation today</label>
+          <select id="e4"><option value="">—</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="ef">
+          <label>Water ration adequate</label>
+          <select id="e5"><option value="">—</option><option>Yes</option><option>Borderline</option><option>No</option></select>
+        </div>
+        <div class="ef">
+          <label>Crew dynamic today</label>
+          <select id="e6"><option value="">—</option><option>Very positive</option><option>Positive</option><option>Neutral</option><option>Some tension</option><option>Conflict</option></select>
+        </div>
+      </div>
+      <label style="margin-top:6px">Pain or discomfort (0=none · 10=severe)</label>
+      <input type="number" id="e7" min="0" max="10" placeholder="0–10">
+      <label>Physical symptoms today</label>
+      <select id="e8">
+        <option value="">—</option><option>None</option><option>Mild headache</option>
+        <option>Moderate headache</option><option>Nausea</option><option>Dizziness</option>
+        <option>Unusual fatigue</option><option>Multiple symptoms</option>
+        <option>Other — describe in journal</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="pj" class="panel">
+    <div class="card">
+      <div class="badge b-red">Daily Journal</div>
+      <h3>Personal reflection</h3>
+      <p class="sub">Write honestly — your observations are valuable. Everything is anonymised. No right or wrong answers. Even short entries help.</p>
+      <div class="tip">💡 Write whatever feels relevant — mood, events, crew dynamics, physical sensations, anything unusual you noticed about yourself or the habitat.</div>
+      <label>Free reflection — what happened today, how did you feel?</label>
+      <textarea id="j1" placeholder="Write freely here. Events, feelings, observations, anything on your mind..."></textarea>
+      <label>Most challenging moment today</label>
+      <input type="text" id="j2" placeholder="Describe briefly...">
+      <label>Most positive moment today</label>
+      <input type="text" id="j3" placeholder="Describe briefly...">
+      <label>Physical symptoms or body sensations</label>
+      <input type="text" id="j4" placeholder="None, or describe...">
+      <label>How do you feel about tomorrow?</label>
+      <select id="j5">
+        <option value="">—</option>
+        <option>Looking forward to it</option>
+        <option>Neutral</option>
+        <option>Slightly anxious</option>
+        <option>Worried</option>
+        <option>Exhausted — just need it to pass</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="save-indicator" id="saveIndicator">✓ Entry saved successfully</div>
+    <button class="btn btn-p" onclick="save()" style="margin-bottom:8px">✓ Save today's entry</button>
+    <button class="btn" onclick="back()">← Back to menu</button>
+  </div>
+</div>
+
+<div id="s2" class="screen">
+  <div class="card">
+    <div class="badge b-green">MISSION DATA</div>
+    <h3>All entries — Expedition Olympus</h3>
+    <p class="sub" id="cntTxt">0 records</p>
+    <div class="brow" style="margin-bottom:10px">
+      <button class="btn btn-sm btn-p" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-sm" onclick="exportJSON()">⬇ Export JSON</button>
+      <button class="btn btn-sm" onclick="back()">← Back</button>
+    </div>
+    <div class="tip">💾 <strong>On Day 8:</strong> click Export CSV and send the file to Kristina (MitrovicKristina@pm.me). This is your complete contribution to the research.</div>
+  </div>
+  <div id="eList"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA DEFINITIONS
+// ─────────────────────────────────────────────────────────────────────────────
+const TLX = [
+  { id:'mental', name:'Mental Demand',
+    desc:'How much thinking, deciding, calculating, remembering, or searching was required today?',
+    ex:'e.g. navigating complex procedures, making decisions under uncertainty, memorising protocols',
+    reversed:false },
+  { id:'physical', name:'Physical Demand',
+    desc:'How much physical effort was required — pushing, pulling, lifting, moving, or controlling equipment?',
+    ex:'e.g. exercise session, equipment setup, moving objects, EVA simulation',
+    reversed:false },
+  { id:'temporal', name:'Time Pressure',
+    desc:'How rushed or time-pressured did you feel due to the pace of tasks and activities today?',
+    ex:'e.g. multiple tasks at once, tight schedules, feeling behind, competing priorities',
+    reversed:false },
+  { id:'performance', name:'Your Performance',
+    desc:'How well do you think you accomplished your goals today? How satisfied are you with what you achieved?',
+    ex:'',
+    reversed:true },
+  { id:'effort', name:'Effort',
+    desc:'How hard did you have to work — mentally and physically — to reach today\'s level of performance?',
+    ex:'e.g. 0 = tasks were easy and effortless all day · 100 = pushed to absolute maximum capacity',
+    reversed:false },
+  { id:'frustration', name:'Frustration',
+    desc:'How irritated, stressed, annoyed, or discouraged did you feel? (compared to calm, relaxed, content)',
+    ex:'e.g. equipment failures, interpersonal friction, unexpected obstacles, miscommunication',
+    reversed:false },
+];
+
+const PANAS = [
+  {w:'Interested',t:'p'},{w:'Distressed',t:'n'},{w:'Excited',t:'p'},{w:'Upset',t:'n'},
+  {w:'Strong',t:'p'},{w:'Guilty',t:'n'},{w:'Scared',t:'n'},{w:'Hostile',t:'n'},
+  {w:'Enthusiastic',t:'p'},{w:'Proud',t:'p'},{w:'Irritable',t:'n'},{w:'Alert',t:'p'},
+  {w:'Ashamed',t:'n'},{w:'Inspired',t:'p'},{w:'Nervous',t:'n'},{w:'Determined',t:'p'},
+  {w:'Attentive',t:'p'},{w:'Jittery',t:'n'},{w:'Active',t:'p'},{w:'Afraid',t:'n'},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STORAGE — with multiple fallback layers
+// ─────────────────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'olympus_research_v2';
+
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) { console.warn('localStorage read failed:', e); }
+  return [];
+}
+
+function saveDB(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return true;
+  } catch(e) {
+    console.warn('localStorage save failed:', e);
+    return false;
+  }
+}
+
+let db = loadDB();
+
+function checkStorage() {
+  const el = document.getElementById('storageStatus');
+  try {
+    localStorage.setItem('_test', '1');
+    localStorage.removeItem('_test');
+    el.textContent = `✓ Storage working · ${db.length} record${db.length!==1?'s':''} saved`;
+    el.style.color = '#48bb78';
+  } catch(e) {
+    el.textContent = '⚠ Storage unavailable in this environment — open this file directly in Chrome or Firefox from your computer';
+    el.style.color = '#fc8181';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let S = { crew:'', day:0, tlx:{}, panas:{} };
+
+function resetS() {
+  S.tlx = {}; S.panas = {};
+  TLX.forEach(t => S.tlx[t.id] = 50);
+  PANAS.forEach((_, i) => S.panas[i] = null);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+function back() { checkStorage(); show('s0'); }
+function viewData() { renderData(); show('s2'); }
+
+function showTab(name) {
+  const names = ['tlx','panas','env','journal'];
+  const ids   = ['pt','pp','pe','pj'];
+  names.forEach((n, i) => {
+    document.getElementById(ids[i]).classList.toggle('on', n === name);
+    document.querySelectorAll('.tab')[i].classList.toggle('on', n === name);
+  });
+  window.scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD TLX
+// ─────────────────────────────────────────────────────────────────────────────
+function buildTLX() {
+  const box = document.getElementById('tlxBox');
+  box.innerHTML = '';
+  TLX.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'tlx-item';
+    const v = S.tlx[item.id];
+    div.innerHTML = `
+      <div class="tlx-row">
+        <span class="tlx-name">${item.name}</span>
+        <span class="tlx-val" id="tv_${item.id}">${v}</span>
+      </div>
+      <div class="tlx-desc">${item.desc}</div>
+      ${item.reversed ? '<div class="tlx-warn">⚠ REVERSED SCALE: 0 = Perfect performance &nbsp;·&nbsp; 100 = Complete failure to meet your goals</div>' : ''}
+      ${item.ex ? `<div class="tlx-ex">${item.ex}</div>` : ''}
+      <input type="range" min="0" max="100" step="1" value="${v}" id="tsl_${item.id}">
+      <div class="tlx-ends">
+        <span>0 — ${item.reversed ? 'Perfect performance' : 'Very low'}</span>
+        <span>${item.reversed ? 'Complete failure' : 'Very high'} — 100</span>
+      </div>`;
+    box.appendChild(div);
+    document.getElementById('tsl_' + item.id).addEventListener('input', function() {
+      S.tlx[item.id] = +this.value;
+      document.getElementById('tv_' + item.id).textContent = this.value;
+      updateProg();
+    });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BUILD PANAS — each button has its own closure, no innerHTML reassignment
+// ─────────────────────────────────────────────────────────────────────────────
+function buildPANAS() {
+  const box = document.getElementById('panasBox');
+  box.innerHTML = '';
+  PANAS.forEach((item, i) => {
+    const row = document.createElement('div');
+    row.className = 'pan-row';
+
+    // Word label with coloured dot
+    const label = document.createElement('div');
+    label.className = 'pan-word';
+    label.innerHTML = `<span class="dot ${item.t === 'p' ? 'dp' : 'dn'}"></span>${item.w}`;
+    row.appendChild(label);
+
+    // 5 rating buttons
+    [1,2,3,4,5].forEach(n => {
+      const btn = document.createElement('button');
+      btn.className = 'pb';
+      btn.textContent = n;
+      // Apply initial state if pre-filled
+      if (S.panas[i] === n) btn.classList.add(item.t === 'p' ? 'sp' : 'sn');
+
+      btn.addEventListener('click', () => {
+        // Update state
+        S.panas[i] = n;
+        // Update only this row's buttons — no full rebuild
+        row.querySelectorAll('.pb').forEach((b, bi) => {
+          b.className = 'pb';
+          if (bi + 1 === n) b.classList.add(item.t === 'p' ? 'sp' : 'sn');
+        });
+        updateProg();
+      });
+      row.appendChild(btn);
+    });
+    box.appendChild(row);
+  });
+}
+
+function updateProg() {
+  const done = Object.values(S.panas).filter(v => v !== null).length;
+  document.getElementById('panCnt').textContent = done;
+  const pct = Math.round(((6 + done) / 26) * 100);
+  document.getElementById('pF').style.width = pct + '%';
+  document.getElementById('fPct').textContent = pct + '%';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// START FORM
+// ─────────────────────────────────────────────────────────────────────────────
+function go() {
+  const crew = document.getElementById('crewSel').value;
+  const day  = document.getElementById('daySel').value;
+  if (!crew || !day) { alert('Please select your crew ID and the mission day.'); return; }
+
+  S.crew = crew;
+  S.day  = +day;
+  resetS();
+
+  // Pre-fill if existing entry for this crew+day
+  const ex = db.find(e => e.crew === crew && e.day === +day);
+  if (ex) {
+    Object.assign(S.tlx,   ex.tlx);
+    Object.assign(S.panas, ex.panas_raw);
+    ['e1','e2','e7'].forEach(id => {
+      document.getElementById(id).value = ex.env?.[id] || '';
+    });
+    ['e3','e4','e5','e6','e8'].forEach(id => {
+      document.getElementById(id).value = ex.env?.[id] || '';
+    });
+    if (ex.j) {
+      ['j1','j2','j3','j4'].forEach(id => {
+        document.getElementById(id).value = ex.j[id] || '';
+      });
+      document.getElementById('j5').value = ex.j.j5 || '';
+    }
+  } else {
+    ['e1','e2','e7','j1','j2','j3','j4'].forEach(id => document.getElementById(id).value = '');
+    ['e3','e4','e5','e6','e8','j5'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  buildTLX();
+  buildPANAS();
+  updateProg();
+  document.getElementById('fTitle').textContent = crew + ' · Day ' + day;
+  document.getElementById('saveIndicator').style.display = 'none';
+  showTab('tlx');
+  show('s1');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SAVE
+// ─────────────────────────────────────────────────────────────────────────────
+function save() {
+  const done = Object.values(S.panas).filter(v => v !== null).length;
+  if (done < 20 && !confirm(
+    `${20 - done} PANAS items unanswered.\n\n` +
+    `For best research data, please answer all 20.\n\nSave anyway?`
+  )) return;
+
+  const pos = PANAS.reduce((a, item, i) => a + (item.t === 'p' ? (S.panas[i] || 0) : 0), 0);
+  const neg = PANAS.reduce((a, item, i) => a + (item.t === 'n' ? (S.panas[i] || 0) : 0), 0);
+  const tlxTotal = Math.round(Object.values(S.tlx).reduce((a, b) => a + b, 0) / 6);
+
+  const entry = {
+    ts:          new Date().toISOString(),
+    crew:        S.crew,
+    day:         S.day,
+    tlx:         { ...S.tlx },
+    tlx_total:   tlxTotal,
+    panas_raw:   { ...S.panas },
+    panas_pos:   pos,
+    panas_neg:   neg,
+    panas_balance: pos - neg,
+    env: {
+      e1: document.getElementById('e1').value,
+      e2: document.getElementById('e2').value,
+      e3: document.getElementById('e3').value,
+      e4: document.getElementById('e4').value,
+      e5: document.getElementById('e5').value,
+      e6: document.getElementById('e6').value,
+      e7: document.getElementById('e7').value,
+      e8: document.getElementById('e8').value,
+    },
+    j: {
+      j1: document.getElementById('j1').value,
+      j2: document.getElementById('j2').value,
+      j3: document.getElementById('j3').value,
+      j4: document.getElementById('j4').value,
+      j5: document.getElementById('j5').value,
+    }
+  };
+
+  // Remove any previous entry for this crew+day, then add new
+  db = db.filter(e => !(e.crew === S.crew && e.day === S.day));
+  db.push(entry);
+
+  const saved = saveDB(db);
+
+  const indicator = document.getElementById('saveIndicator');
+  if (saved) {
+    indicator.textContent = `✓ Saved successfully — ${S.crew} · Day ${S.day} · TLX:${tlxTotal} PANAS+:${pos} PANAS-:${neg}`;
+    indicator.style.background = '#1a3a1a';
+    indicator.style.borderColor = '#276749';
+    indicator.style.color = '#68d391';
+  } else {
+    indicator.textContent = `⚠ Storage may not be available in this environment. Open this file directly in Chrome/Firefox from your computer.`;
+    indicator.style.background = '#3d2a00';
+    indicator.style.borderColor = '#f6ad55';
+    indicator.style.color = '#f6ad55';
+  }
+  indicator.style.display = 'block';
+
+  alert(
+    `✓ Entry saved\n\n` +
+    `${S.crew} · Day ${S.day}\n` +
+    `NASA-TLX total: ${tlxTotal}/100\n` +
+    `PANAS positive: ${pos}  ·  PANAS negative: ${neg}\n\n` +
+    `Thank you — your data contributes to the research.\n\n` +
+    (saved ? '💾 Data saved to browser storage.' : '⚠ Please open this file in Chrome or Firefox on your computer.')
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA VIEW
+// ─────────────────────────────────────────────────────────────────────────────
+function renderData() {
+  const cr = new Set(db.map(e => e.crew)).size;
+  document.getElementById('cntTxt').textContent =
+    `${db.length} record${db.length !== 1 ? 's' : ''} from ${cr} crew member${cr !== 1 ? 's' : ''}`;
+
+  const list = document.getElementById('eList');
+  if (!db.length) {
+    list.innerHTML = '<div class="empty">No entries yet. Complete daily assessments to see data here.</div>';
+    return;
+  }
+
+  const sorted = [...db].sort((a, b) => a.day - b.day || a.crew.localeCompare(b.crew));
+  list.innerHTML = sorted.map(e => {
+    const c = e.tlx_total > 70 ? 'hi' : e.tlx_total > 40 ? 'mid' : 'lo';
+    const d = new Date(e.ts);
+    const time = d.toLocaleString('en-GB', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="ec">
+      <div class="eh">
+        <span class="ec-crew">${e.crew}</span>
+        <span class="ec-day">Day ${e.day}</span>
+      </div>
+      <div class="sc-row">
+        <div class="sc"><div class="sc-l">TLX total</div><div class="sc-v ${c}">${e.tlx_total}</div></div>
+        <div class="sc"><div class="sc-l">PANAS positive</div><div class="sc-v lo">${e.panas_pos}</div></div>
+        <div class="sc"><div class="sc-l">PANAS negative</div><div class="sc-v hi">${e.panas_neg}</div></div>
+      </div>
+      <div style="font-size:10px;color:#4a5568;margin-top:6px">Saved: ${time}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORT
+// ─────────────────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!db.length) { alert('No data to export yet. Complete at least one daily assessment first.'); return; }
+
+  const headers = [
+    'timestamp','crew','day',
+    'tlx_mental','tlx_physical','tlx_temporal','tlx_performance','tlx_effort','tlx_frustration','tlx_total',
+    'panas_positive_total','panas_negative_total','panas_balance',
+    ...PANAS.map(p => 'panas_' + p.w.toLowerCase()),
+    'sleep_quality','frustration_events','exercise','emergency_sim',
+    'water_adequate','crew_dynamic','pain_level','symptoms',
+    'journal_text','challenge','positive_moment','body_symptoms','tomorrow_feeling'
+  ];
+
+  const rows = db.map(e => [
+    `"${e.ts}"`, `"${e.crew}"`, e.day,
+    e.tlx.mental, e.tlx.physical, e.tlx.temporal, e.tlx.performance, e.tlx.effort, e.tlx.frustration, e.tlx_total,
+    e.panas_pos, e.panas_neg, e.panas_balance,
+    ...PANAS.map((_, i) => e.panas_raw[i] || ''),
+    e.env.e1, e.env.e2,
+    `"${e.env.e3}"`, `"${e.env.e4}"`, `"${e.env.e5}"`, `"${e.env.e6}"`,
+    e.env.e7, `"${e.env.e8}"`,
+    `"${(e.j.j1||'').replace(/"/g,"'")}"`,
+    `"${(e.j.j2||'').replace(/"/g,"'")}"`,
+    `"${(e.j.j3||'').replace(/"/g,"'")}"`,
+    `"${(e.j.j4||'').replace(/"/g,"'")}"`,
+    `"${e.j.j5||''}"`,
+  ].join(','));
+
+  dl(
+    `expedition_olympus_${e => e.crew}_data.csv`.replace('${e => e.crew}', db[0]?.crew || 'all'),
+    [headers.join(','), ...rows].join('\n'),
+    'text/csv'
+  );
+}
+
+function exportJSON() {
+  if (!db.length) { alert('No data to export yet.'); return; }
+  dl('expedition_olympus_data.json', JSON.stringify(db, null, 2), 'application/json');
+}
+
+function dl(filename, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+checkStorage();
+</script>
+</body>
+</html>
