@@ -5,35 +5,6 @@ Expedition Olympus, AATC, May 2026
 Reads mission documents (PDF, DOCX, TXT, MD) and answers questions
 about habitat procedures using a local Ollama model.
 
-CHANGES FROM v1
----------------
-1. REMOVED the hardcoded "SEVERE EMERGENCY — Call 112 now" instruction
-   from the system prompt. It contradicted the SOPs (E-001 Section 8
-   explicitly forbids dialling terrestrial numbers from Mars) and was
-   the actual source of the "Call 112" answer, not a model hallucination.
-
-2. STRENGTHENED grounding. The model is now told to cite the SOP ID it
-   used (e.g. "E-001") and to refuse with an exact phrase when a question
-   is not covered. This makes refusal vs. hallucination measurable.
-
-3. BUMPED MAX_CONTEXT from 3500 to 12000 chars. E-001 (~6.5k chars)
-   and H-001 (~18k chars) together exceeded the old budget. 12000 fits
-   E-001 fully plus the quick-reference and first hazard sections of
-   H-001. Raise further if you have GPU or more SOPs.
-
-4. CONTENT-AWARE document scoring. Instead of pure filename matching,
-   each document is scored by filename keywords (emergency / hazard /
-   fire / etc.), filename-vs-query overlap, and content-head-vs-query
-   overlap. The "112" keyword has been removed.
-
-5. SOP CITATION DETECTION in logs. The log now records which SOP IDs
-   the response cited (E-001, H-001, M-001 etc.), which files were
-   loaded into context, the generation time, and the model name. This
-   makes the log directly usable for the Section 10 evaluation protocol.
-
-6. NEW 'reload' command for re-reading docs without restarting the
-   session — useful while iterating on the SOP corpus.
-
 Requires: pip install pypdf2 python-docx
 Run: python mission_agent_local.py
 """
